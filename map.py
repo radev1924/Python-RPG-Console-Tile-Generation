@@ -60,14 +60,21 @@ class Map:
     def display_map(self) -> None:
         frame = "x" + self.width * "=" + "x"
         print(frame)
-        for row, explored_row in zip(self.map_data, self.exploration_process):
+
+        for y_index, (row, explored_row) in enumerate(zip(self.map_data, self.exploration_process)):
+
+            if y_index in range(len(self.explored_tiles)):
+                legend = self.explored_tiles[y_index].colored_legend
+            else
+                legend = ""
+
             print(
                 "|" + "".join(
                     [
                         tile.colored_symbol if is_explored else " "
                         for tile, is_explored in zip(row, explored_row)
                     ]
-                ) + "|"
+                ) + "|" + legend
             )
         print(frame)
 
