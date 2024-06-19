@@ -16,7 +16,14 @@ class Map:
         self.generate_patch(water, 1, 10, 12)
 
     def generate_map(self) -> None:
-        self.map_data = [[plains for _ in range(self.width)] for _ in range(self.height)]
+        self.init_map_data = [[plains.colored_symbol for _ in range(self.width)] for _ in range(self.height)]
+        self.map_data = deepcopy(self.init_map_data)
+        self.exploration_process =[[0 for _ in range (self.width)] for _ in range(self.height)]
+
+    def update_map(self, pos: list[int], marker: Tile) -> None:
+        x, y = pos
+        self.map_data = deepcopy(self.init_map_data)
+        self.map_data[y][x] = marker.colored_symbol
 
     def generate_patch(
             self,
@@ -45,7 +52,35 @@ class Map:
     def display_map(self) -> None:
         frame = "x" + self.width * "=" + "x"
         print(frame)
-        for row in self.map_data:
-            row_tiles = [tile.symbol for tile in row]
-            print("|" + "".join(row_tiles) + "|")
+        for row, explored_row in zip(self.map_data, self.exploration_process):
+            print(
+                "|" + "".join(
+                    [
+                        tile.colored_symbol if is_explored else " "
+                        for tile, is_explored in zip(row, explored_row)
+                    ]
+                ) + "|"
+            )
         print(frame)
+
+    def reveal_map(self, pos: list[int]) -> None:
+        x, y = pos
+        sight_range = range(-2, 3)
+        fov = [
+            [0, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1],
+            [0, 1, 1, 1, 0],
+
+        ]
+        for y_index in sight_range:
+            tile_y = y + y_index
+            if 0 <= tile_y < self.height:
+                for x_index in sight_range:
+                    tile_x = x + x_index
+                    if 0 <= tile_x < self.width and fov[y_index + 2][x_index + 2]:
+                        self.exploration_process[tile_y][tile_x] = 1
+                        revealed_tile = self.init_map_data[tile_y][tile_x]
+                        if revealed_tile not in self.explored_tiles:
+                            self.explored_tiles.append(revealed_tile)
