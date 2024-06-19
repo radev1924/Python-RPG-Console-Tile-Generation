@@ -7,13 +7,21 @@ class Map:
         self.width = width
         self.height = height
 
+        self.init_map_data: list[list[str]]
+        self.full_map_data: list[[str]]
         self.map_data: list[list[Tile]]
+        self.exporation_process: [player]
 
         self.generate_map()
         self.generate_patch(forest, 2, 5, 7)
         self.generate_patch(pines, 2, 2, 5)
         self.generate_patch(mountain, 3, 5, 7)
         self.generate_patch(water, 1, 10, 12)
+        self.generate_patch(town, 3, 3, 3)
+
+        self.movement_options = {...}
+
+        self.explored_tiles = [player]
 
     def generate_map(self) -> None:
         self.init_map_data = [[plains.colored_symbol for _ in range(self.width)] for _ in range(self.height)]
